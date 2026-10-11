@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+        <title>Upvotes</title>
+        <style>
+            :root {
+                box-sizing: border-box;
+                padding-top: env(safe-area-inset-top, 0px);
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+            }
+            html {
+                scroll-padding-top: env(safe-area-inset-top, 0px);
+            }
+            *, *::before, *::after {
+                box-sizing: inherit;
+                border-radius: 0;
+            }
+            body {
+                font-family: Helvetica, Arial, sans-serif;
+                background-color: #0c0c0c;
+                color: #ffffff;
+                margin: 0;
+                padding: 16px;
+                line-height: 1.4;
+            }
+            div {
+                background-color: #1a1a1a;
+            }
+            .clear {
+                background-color: transparent;
+            }
+            [hidden] {
+                display: none !important;
+            }
+            h1, h2, h3 {
+                margin: 0;
+            }
+            h1 { font-size: 24px; }
+            h2 { font-size: 20px; }
+            h3 { font-size: 15px; }
+            button, input, select, textarea {
+                font-family: inherit;
+                font-size: 14px;
+                color: #ffffff;
+                background-color: #0c0c0c;
+                border: 1px solid #4d4d4d;
+                border-radius: 0;
+                margin: 0;
+            }
+            button {
+                cursor: pointer;
+                padding: 6px 14px;
+            }
+            button:hover {
+                border-color: #ffffff;
+            }
+            button:disabled {
+                cursor: default;
+                opacity: 0.6;
+            }
+            input, select, textarea {
+                padding: 8px 10px;
+                width: 100%;
+            }
+            input[type="file"] {
+                cursor: pointer;
+            }
+            input[type="file"]::file-selector-button {
+                font-family: inherit;
+                font-size: 14px;
+                color: #ffffff;
+                background-color: #1a1a1a;
+                border: 1px solid #4d4d4d;
+                border-radius: 0;
+                padding: 4px 10px;
+                margin-right: 10px;
+                cursor: pointer;
+            }
+            input[type="file"]::file-selector-button:hover {
+                border-color: #ffffff;
+            }
+            textarea {
+                resize: vertical;
+                min-height: 72px;
+            }
+            input::placeholder, textarea::placeholder {
+                color: #8c8c8c;
+            }
+            :focus-visible {
+                outline: 2px solid #ffffff;
+                outline-offset: 2px;
+            }
+            .solid {
+                background-color: #ffffff;
+                color: #0c0c0c;
+                border-color: #ffffff;
+                font-weight: bold;
+            }
+            .solid:hover {
+                background-color: #d9d9d9;
+                border-color: #d9d9d9;
+            }
+            .on,
+            button[aria-pressed="true"],
+            button[aria-current="true"] {
+                background-color: #ffffff;
+                color: #0c0c0c;
+                border-color: #ffffff;
+            }
+            .linklike {
+                border: 0;
+                background-color: transparent;
+                padding: 0;
+                color: #8c8c8c;
+                font-size: inherit;
+                text-decoration: underline;
+            }
+            .linklike:hover {
+                color: #ffffff;
+            }
+            .muted {
+                color: #8c8c8c;
+            }
+            .page {
+                max-width: 960px;
+                margin: 0 auto;
+                background-color: transparent;
+            }
+            /* top bar */
+            .topbar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                padding: 8px 16px;
+                margin-bottom: 8px;
+            }
+            .actions {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .account {
+                position: relative;
+            }
+            .account-btn {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 3px 10px 3px 4px;
+            }
+            .menu {
+                position: absolute;
+                top: calc(100% + 4px);
+                right: 0;
+                width: 220px;
+                border: 1px solid #4d4d4d;
+                z-index: 5;
+            }
+            .menu-head {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 12px;
+                border-bottom: 1px solid #333333;
+            }
+            .menu button {
+                display: block;
+                width: 100%;
+                text-align: left;
+                border: 0;
+                border-bottom: 1px solid #333333;
+                padding: 10px 12px;
+                background-color: #1a1a1a;
+            }
+            .menu button:last-child {
+                border-bottom: 0;
+            }
+            .menu button:hover {
+                background-color: #ffffff;
+                color: #0c0c0c;
+            }
+            .notice {
+                min-height: 0;
+                padding: 0 16px;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+            .notice:not(:empty) {
+                padding: 8px 16px;
+                border: 1px solid #4d4d4d;
+            }
+            /* layout */
+            .layout {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) 260px;
+                gap: 8px;
+                align-items: start;
+                background-color: transparent;
+            }
+            .feed-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                padding: 12px 16px;
+                margin-bottom: 8px;
+            }
+            .feed-head p {
+                margin: 2px 0 0;
+                font-size: 13px;
+                color: #8c8c8c;
+                background-color: transparent;
+            }
+            .tabs {
+                display: flex;
+                background-color: transparent;
+                flex: 0 0 auto;
+            }
+            .tabs button + button {
+                border-left: 0;
+            }
+            /* posts */
+            .post {
+                display: flex;
+                margin-bottom: 8px;
+            }
+            .vote {
+                flex: 0 0 64px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                padding: 12px 0;
+            }
+            .vote button {
+                width: 36px;
+                height: 32px;
+                padding: 0;
+                line-height: 1;
+            }
+            .count {
+                font-weight: bold;
+                font-size: 15px;
+                background-color: transparent;
+                font-variant-numeric: tabular-nums;
+            }
+            .thumb {
+                flex: 0 0 auto;
+                padding: 12px 12px 12px 0;
+                display: flex;
+                align-items: center;
+            }
+            .thumb a {
+                display: block;
+                background-color: transparent;
+            }
+            .thumb img {
+                display: block;
+                width: 96px;
+                height: 96px;
+                object-fit: cover;
+                border: 1px solid #4d4d4d;
+                background-color: #292929;
+            }
+            .thumb a:hover img {
+                border-color: #ffffff;
+            }
+            .body {
+                flex: 1;
+                min-width: 0;
+                padding: 12px 16px 12px 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            .title {
+                font-size: 17px;
+                font-weight: bold;
+                margin: 0 0 4px;
+                overflow-wrap: anywhere;
+                background-color: transparent;
+            }
+            .title a {
+                color: #ffffff;
+                text-decoration: none;
+            }
+            .title a:hover {
+                text-decoration: underline;
+            }
+            .meta {
+                font-size: 13px;
+                color: #8c8c8c;
+                background-color: transparent;
+            }
+            .mod-delete {
+                color: #ff8c8c;
+            }
+            .mod-delete:hover {
+                color: #ffffff;
+            }
+            .danger {
+                color: #ff8c8c;
+                border-color: #ff8c8c;
+            }
+            .danger:hover {
+                background-color: #ff8c8c;
+                color: #0c0c0c;
+                border-color: #ff8c8c;
+            }
+            .empty {
+                padding: 24px 16px;
+                color: #8c8c8c;
+            }
+            /* sidebar */
+            .side {
+                position: sticky;
+                top: 8px;
+            }
+            .side-block {
+                margin-bottom: 8px;
+            }
+            .side-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                padding: 12px 16px;
+                border-bottom: 1px solid #333333;
+            }
+            .side-all {
+                display: block;
+                width: 100%;
+                text-align: left;
+                border: 0;
+                border-bottom: 1px solid #333333;
+                padding: 10px 16px;
+                background-color: #1a1a1a;
+            }
+            .side-all[aria-current="true"] {
+                background-color: #ffffff;
+            }
+            .sublist {
+                max-height: 480px;
+                overflow-y: auto;
+            }
+            .sub {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 8px 16px;
+                border-bottom: 1px solid #333333;
+            }
+            .sub:last-child {
+                border-bottom: 0;
+            }
+            .sub-main {
+                flex: 1;
+                min-width: 0;
+                text-align: left;
+                border: 0;
+                padding: 0;
+                background-color: transparent;
+                display: block;
+            }
+            .sub-main[aria-current="true"] .sub-name {
+                text-decoration: underline;
+            }
+            .sub-name {
+                display: block;
+                font-weight: bold;
+                font-size: 14px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                background-color: transparent;
+            }
+            .sub-members {
+                display: block;
+                font-size: 12px;
+                color: #8c8c8c;
+                background-color: transparent;
+            }
+            .sub .join {
+                padding: 4px 10px;
+                font-size: 13px;
+            }
+            .post-avatar { vertical-align: middle; margin: 0 3px 0 5px; }
+            .avatar {
+                display: block;
+                flex: 0 0 auto;
+                border: 1px solid #4d4d4d;
+            }
+            /* dialogs */
+            .overlay {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 10;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                padding: calc(env(safe-area-inset-top, 0px) + 40px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
+                overflow-y: auto;
+                background-color: rgba(0, 0, 0, 0.8);
+            }
+            .dialog {
+                width: 100%;
+                max-width: 480px;
+                border: 1px solid #4d4d4d;
+                padding: 20px;
+            }
+            .dialog h2 {
+                margin-bottom: 16px;
+            }
+            .field {
+                margin-bottom: 14px;
+                background-color: transparent;
+            }
+            .field label {
+                display: block;
+                font-size: 13px;
+                margin-bottom: 4px;
+                color: #8c8c8c;
+            }
+            .preview {
+                margin-top: 8px;
+                background-color: transparent;
+                font-size: 13px;
+            }
+            .preview img {
+                display: block;
+                max-width: 100%;
+                max-height: 220px;
+                border: 1px solid #4d4d4d;
+                margin-bottom: 6px;
+            }
+            .error {
+                min-height: 18px;
+                font-size: 13px;
+                margin-bottom: 8px;
+                background-color: transparent;
+            }
+            .dialog-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 8px;
+                background-color: transparent;
+            }
+            @media (max-width: 720px) {
+                body { padding: 8px; }
+                .layout { grid-template-columns: minmax(0, 1fr); }
+                .side { position: static; order: -1; }
+                .sublist { max-height: 200px; }
+                .thumb img { width: 72px; height: 72px; }
+                .vote { flex-basis: 52px; }
+                .feed-head { flex-wrap: wrap; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="page clear">
+            <div class="topbar">
+                <button id="open-post" type="button" class="solid" disabled>Post</button>
+                <div class="account clear" id="account">
+                    <button id="account-btn" type="button" class="account-btn" aria-haspopup="true" aria-expanded="false">Log in / Sign up ▾</button>
+                    <div id="menu" class="menu" hidden></div>
+                </div>
+            </div>
+            <div id="notice" class="notice clear" role="status" aria-live="polite"></div>
+            <div class="layout">
+                <main class="clear">
+                    <div class="feed-head">
+                        <div class="clear">
+                            <h2 id="feed-title">All posts</h2>
+                            <p id="feed-desc"></p>
+                        </div>
+                        <div class="actions clear">
+                            <button id="delete-sub" type="button" class="danger" hidden>Delete sub</button>
+                            <div class="tabs" role="group" aria-label="Sort posts">
+                                <button id="sort-top" type="button" aria-pressed="true">Top</button>
+                                <button id="sort-new" type="button" aria-pressed="false">New</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="list" class="clear"></div>
+                </main>
+                <aside class="side clear">
+                    <div class="side-block">
+                        <div class="side-head">
+                            <h3>Subs</h3>
+                            <button id="open-sub" type="button" disabled>Make a sub</button>
+                        </div>
+                        <button id="view-all" type="button" class="side-all">All posts</button>
+                        <div id="sublist" class="sublist"></div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+        <div id="dlg-post" class="overlay" hidden>
+            <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="post-h" autocomplete="off" id="form-post">
+                <h2 id="post-h">New Post</h2>
+                <div class="field">
+                    <label for="p-sub">Sub</label>
+                    <select id="p-sub"></select>
+                </div>
+                <div class="field">
+                    <label for="p-title">Title</label>
+                    <input type="text" id="p-title" maxlength="200" required>
+                </div>
+                <div class="field">
+                    <label for="p-url">Link (optional)</label>
+                    <input id="p-url" type="url">
+                </div>
+                <div class="field">
+                    <label for="p-file">Image (optional, JPG, PNG, GIF or WebP, up to 5 MB)</label>
+                    <input id="p-file" type="file" accept="image/jpeg,image/png,image/gif,image/webp">
+                    <div id="p-preview" class="preview" hidden>
+                        <img id="p-preview-img" alt="Preview of the selected image">
+                        <button type="button" id="p-clear" class="linklike">Remove image</button>
+                    </div>
+                </div>
+                <div class="error" id="p-err" role="alert"></div>
+                <div class="dialog-actions">
+                    <button type="button" data-close="dlg-post">Cancel</button>
+                    <button type="submit" class="solid" id="p-submit">Post</button>
+                </div>
+            </form>
+        </div>
+        <div id="dlg-sub" class="overlay" hidden>
+            <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="sub-h" autocomplete="off" id="form-sub">
+                <h2 id="sub-h">New Sub</h2>
+                <div class="field">
+                    <label for="s-name">Name (3-21 characters, numbers or underscores)</label>
+                    <input type="text" id="s-name" maxlength="21" required placeholder="A good name!">
+                </div>
+                <div class="field">
+                    <label for="s-desc">Description</label>
+                    <textarea id="s-desc" maxlength="200"></textarea>
+                </div>
+                <div class="error" id="s-err" role="alert"></div>
+                <div class="dialog-actions">
+                    <button type="button" data-close="dlg-sub">Cancel</button>
+                    <button type="submit" class="solid">Create</button>
+                </div>
+            </form>
+        </div>
+        <div id="dlg-account" class="overlay" hidden>
+            <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="account-h" autocomplete="on" id="form-account">
+                <h2 id="account-h">Create your Upvotes account</h2>
+                <div class="field"><label for="a-email">Email</label><input id="a-email" type="email" autocomplete="email" required></div>
+                <div class="field"><label for="a-username">Username (3–21 letters, numbers or underscores)</label><input id="a-username" type="text" minlength="3" maxlength="21" pattern="[A-Za-z0-9_]{3,21}" autocomplete="username" required></div>
+                <div class="field"><label for="a-password">Password (at least 8 characters)</label><input id="a-password" type="password" minlength="8" autocomplete="new-password" required></div>
+                <div class="field"><label for="a-avatar">Profile picture (optional, JPG/PNG/GIF/WebP, up to 2 MB)</label><input id="a-avatar" type="file" accept="image/jpeg,image/png,image/gif,image/webp"></div>
+                <div class="error" id="a-err" role="alert"></div>
+                <div class="dialog-actions"><button type="button" data-close="dlg-account">Cancel</button><button type="submit" class="solid" id="a-submit">Create account</button></div>
+                <p class="muted">Already registered? <button type="button" class="linklike" id="a-switch-login">Log in</button></p>
+            </form>
+        </div>
+        <div id="dlg-login" class="overlay" hidden>
+            <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="login-h" autocomplete="on" id="form-login">
+                <h2 id="login-h">Log in to Upvotes</h2>
+                <div class="field"><label for="l-email">Email</label><input id="l-email" type="email" autocomplete="username" required></div>
+                <div class="field"><label for="l-password">Password</label><input id="l-password" type="password" autocomplete="current-password" required></div>
+                <div class="error" id="l-err" role="alert"></div>
+                <div class="dialog-actions"><button type="button" data-close="dlg-login">Cancel</button><button type="submit" class="solid" id="l-submit">Log in</button></div>
+                <p class="muted">New here? <button type="button" class="linklike" id="l-switch-signup">Create an account</button></p>
+            </form>
+        </div>
+        <div id="dlg-username" class="overlay" hidden>
+            <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="username-h" autocomplete="off" id="form-username">
+                <h2 id="username-h">Change username</h2>
+                <p class="muted">Your username must be 3–21 letters, numbers or underscores.</p>
+                <div class="field"><label for="new-username">New username</label><input id="new-username" type="text" minlength="3" maxlength="21" pattern="[A-Za-z0-9_]{3,21}" autocomplete="username" required></div>
+                <div class="error" id="username-err" role="alert"></div>
+                <div class="dialog-actions"><button type="button" data-close="dlg-username">Cancel</button><button type="submit" class="solid" id="username-submit">Save username</button></div>
+            </form>
+        </div>
+        <input id="avatar-file" type="file" accept="image/jpeg,image/png,image/gif,image/webp" hidden>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script>
+            var MIN = 60 * 1000, HOUR = 60 * MIN, DAY = 24 * HOUR;
+            var SUPABASE_URL = 'https://xvrmatpvosgqbwxbqbtd.supabase.co';
+            var SUPABASE_ANON_KEY = 'sb_publishable_HAHT3mz4AkFgofeF4o-pSA_vmGfb-iP';
+            var IMAGE_BUCKET = 'post-images';
+            var MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+            var IMAGE_TYPES = {
+                'image/jpeg': 'jpg',
+                'image/png': 'png',
+                'image/gif': 'gif',
+                'image/webp': 'webp'
+            };
+            var VISITOR_KEY = 'upvotes-visitor-id';
+            var visitorId = localStorage.getItem(VISITOR_KEY);
+            if (!visitorId) {
+                visitorId = crypto.randomUUID();
+                localStorage.setItem(VISITOR_KEY, visitorId);
+            }
+            var ME = 'visitor_' + visitorId.slice(0, 8);
+            var supabaseClient = null;
+            var state = {
+                view: 'all',        // 'all' | 'joined' | 'mine' | 's:<name>'
+                sort: 'top',
+                isModerator: false,
+                moderatorEmail: '',
+                voted: {},
+                subs: [],
+                posts: []
+            };
+            var order = [];
+            var lastFocus = null;
+            var noticeTimer = null;
+            var previewUrl = null;
+            /* ---------- helpers ---------- */
+            function el(tag, cls, text) {
+                var n = document.createElement(tag);
+                if (cls) n.className = cls;
+                if (text !== undefined) n.textContent = text;
+                return n;
+            }
+            function usernameNode(username, prefix, isCurrentUser) {
+                var name = String(username || '');
+                var n = el('span', '', (prefix || '') + name);
+                if (isCurrentUser) n.style.color = '#F2CD5D';
+                return n;
+            }
+            function ago(ts) {
+                var d = Date.now() - ts;
+                if (d < MIN) return 'just now';
+                if (d < HOUR) return Math.floor(d / MIN) + ' min ago';
+                if (d < DAY) return Math.floor(d / HOUR) + ' hr ago';
+                return Math.floor(d / DAY) + ' d ago';
+            }
+            function host(url) {
+                try { return new URL(url).hostname.replace(/^www\./i, ''); } catch (e) { return ''; }
+            }
+            function normalizeUrl(u) {
+                u = (u || '').trim();
+                if (!u) return '';
+                if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+                try { new URL(u); return u; } catch (e) { return ''; }
+            }
+            function members(n) {
+                return (n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n)) + ' members';
+            }
+            function hash(str) {
+                var h = 0;
+                for (var i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+                return Math.abs(h);
+            }
+            function placeholder(seed, w, h) {
+                var shades = ['#222222', '#292929', '#303030', '#363636'];
+                var fill = shades[hash(seed) % shades.length];
+                var svg = '<svg xmlns="http\://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '">' +
+                    '<rect width="' + w + '" height="' + h + '" fill="' + fill + '"/>' +
+                    '<path d="M0 0L' + w + ' ' + h + 'M' + w + ' 0L0 ' + h + '" stroke="#555555" stroke-width="2" fill="none"/>' +
+                    '</svg>';
+                return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+            }
+            function img(seed, size, cls) {
+                var i = document.createElement('img');
+                i.src = placeholder(seed, size, size);
+                i.width = size;
+                i.height = size;
+                i.alt = '';
+                if (cls) i.className = cls;
+                return i;
+            }
+            function imageUrl(path) {
+                return supabaseClient.storage.from(IMAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+            }
+            function checkImage(file) {
+                if (!IMAGE_TYPES[file.type]) return 'Images must be JPG, PNG, GIF or WebP.';
+                if (file.size > MAX_IMAGE_BYTES) return 'That image is over 5 MB. Pick a smaller one.';
+                return '';
+            }
+            function avatarUrl(path) {
+                if (!path || !supabaseClient) return '';
+                return supabaseClient.storage.from(ACCOUNT_AVATAR_BUCKET).getPublicUrl(path).data.publicUrl;
+            }
+            function accountAvatar(seed, path, size, cls) {
+                var node = img(seed, size, cls || 'avatar');
+                var url = avatarUrl(path);
+                if (url) { node.src = url; node.onerror = function () { node.onerror = null; node.src = placeholder(seed, size, size); }; }
+                return node;
+            }
+            async function loadProfile(user) {
+                if (!user) { currentProfile = null; state.profile = null; return; }
+                var result = await supabaseClient.from('profiles').select('id,username,avatar_path').eq('id', user.id).maybeSingle();
+                if (result.error) throw result.error;
+                if (!result.data) {
+                    var username = (user.user_metadata && user.user_metadata.username) || ('user_' + user.id.slice(0, 8));
+                    var created = await supabaseClient.from('profiles').insert({ id: user.id, username: username }).select('id,username,avatar_path').single();
+                    if (created.error) {
+                        if (created.error.code === '23505') throw new Error('That username is taken. Please choose another one.');
+                        throw created.error;
+                    }
+                    currentProfile = created.data;
+                } else currentProfile = result.data;
+                state.profile = currentProfile;
+                ME = currentProfile.username;
+            }
+            async function applyUserSession(session) {
+                currentUser = session && session.user ? session.user : null;
+                state.currentUser = currentUser;
+                visitorId = currentUser ? currentUser.id : visitorIdForGuest();
+                if (currentUser) await loadProfile(currentUser);
+                else { currentProfile = null; state.profile = null; ME = 'visitor_' + visitorId.slice(0, 8); }
+                setModeratorSession(session);
+                await refreshData();
+                renderAll();
+            }
+            function visitorIdForGuest() {
+                var id = localStorage.getItem(VISITOR_KEY);
+                if (!id) { id = crypto.randomUUID(); localStorage.setItem(VISITOR_KEY, id); }
+                return id;
+            }
+            function explainAuthError(error) {
+                var msg = error && error.message ? error.message : String(error);
+                if (/duplicate key|unique constraint|profiles_username/i.test(msg)) return 'That username is taken. Please choose another one.';
+                if (/user already registered/i.test(msg)) return 'An account with that email already exists. Try logging in.';
+                return msg;
+            }
+            function getSub(name) {
+                for (var i = 0; i < state.subs.length; i++) if (state.subs[i].name === name) return state.subs[i];
+                return null;
+            }
+            function getPost(id) {
+                for (var i = 0; i < state.posts.length; i++) if (state.posts[i].id === id) return state.posts[i];
+                return null;
+            }
+            async function refreshData() {
+                var results = await Promise.all([
+                    supabaseClient.from('subs').select('id,name,description,member_count'),
+                    supabaseClient.from('posts').select('id,sub_id,author_id,author_name,title,url,upvotes,created_at,has_image,image_path'),
+                    supabaseClient.rpc('get_visitor_state', { p_visitor_id: visitorId })
+                ]);
+                results.forEach(function (result) {
+                    if (result.error) throw result.error;
+                });
+                var visitorState = results[2].data || { memberships: [], votes: [] };
+                var profileResult = await supabaseClient.from('profiles').select('id,username,avatar_path');
+                if (profileResult.error) throw profileResult.error;
+                profilesById = {};
+                (profileResult.data || []).forEach(function (profile) { profilesById[profile.id] = profile; });
+                var joined = {};
+                var voted = {};
+                (visitorState.memberships || []).forEach(function (id) { joined[id] = true; });
+                (visitorState.votes || []).forEach(function (id) { voted[id] = true; });
+                state.subs = results[0].data.map(function (s) {
+                    return {
+                        id: s.id, name: s.name, desc: s.description, members: s.member_count,
+                        joined: !!joined[s.id]
+                    };
+                });
+                state.posts = results[1].data.map(function (p) {
+                    var sub = state.subs.filter(function (s) { return s.id === p.sub_id; })[0];
+                    return {
+                        id: p.id, subId: p.sub_id, sub: sub ? sub.name : '',
+                        authorId: p.author_id, author: p.author_name, title: p.title, url: p.url || '',
+                        votes: p.upvotes, created: new Date(p.created_at).getTime(), image: p.has_image,
+                        imagePath: p.image_path || ''
+                    };
+                });
+                state.voted = voted;
+                if (state.view.indexOf('s:') === 0 && !getSub(state.view.slice(2))) state.view = 'all';
+                sortOrder();
+            }
+            function notify(msg) {
+                var n = document.getElementById('notice');
+                n.textContent = msg;
+                clearTimeout(noticeTimer);
+                noticeTimer = setTimeout(function () { n.textContent = ''; }, 3500);
+            }
+            function showError(error) {
+                console.error('Supabase request failed:', error);
+                notify('Supabase error: ' + (error.message || String(error)));
+            }
+            function setModeratorSession(session) {
+                var user = session && session.user;
+                state.isModerator = !!(user && user.app_metadata && user.app_metadata.role === 'moderator');
+                state.moderatorEmail = state.isModerator ? (user.email || 'Moderator') : '';
+            }
+            async function deletePost(post, button) {
+                button.disabled = true;
+                try {
+                    var result = await supabaseClient.from('posts')
+                        .delete()
+                        .eq('id', post.id)
+                        .select('id');
+                    if (result.error) throw result.error;
+                    if (!result.data || result.data.length === 0) {
+                        throw new Error('The post was not deleted. Confirm this account has the moderator role and rerun the setup SQL.');
+                    }
+                    if (post.imagePath) {
+                        // Best effort: the post is already gone, so don't fail the delete over the file.
+                        var removed = await supabaseClient.storage.from(IMAGE_BUCKET).remove([post.imagePath]);
+                        if (removed.error) console.error('Could not remove image:', removed.error);
+                    }
+                    await refreshData();
+                    renderAll();
+                    notify('Post deleted.');
+                } catch (error) {
+                    showError(error);
+                    button.disabled = false;
+                }
+            }
+            async function deleteSub(sub, button) {
+                var subPosts = state.posts.filter(function (p) { return p.subId === sub.id; });
+                var paths = subPosts.filter(function (p) { return p.imagePath; }).map(function (p) { return p.imagePath; });
+                button.disabled = true;
+                try {
+                    var result = await supabaseClient.rpc('delete_sub', { p_sub_id: sub.id });
+                    if (result.error) throw result.error;
+                    if (paths.length) {
+                        // Best effort: the sub is already gone, so don't fail the delete over the files.
+                        var removed = await supabaseClient.storage.from(IMAGE_BUCKET).remove(paths);
+                        if (removed.error) console.error('Could not remove images:', removed.error);
+                    }
+                    state.view = 'all';
+                    await refreshData();
+                    renderAll();
+                    notify('Deleted s/' + sub.name + '.');
+                } catch (error) {
+                    showError(error);
+                } finally {
+                    button.disabled = false;
+                }
+            }
+            function sortOrder() {
+                order = state.posts.slice().sort(function (a, b) {
+                    if (state.sort === 'new') return b.created - a.created;
+                    return (b.votes - a.votes) || (b.created - a.created);
+                }).map(function (p) { return p.id; });
+            }
+            function inView(p) {
+                var v = state.view;
+                if (v === 'all') return true;
+                if (v === 'mine') return p.authorId === visitorId;
+                if (v === 'joined') { var s = getSub(p.sub); return !!(s && s.joined); }
+                if (v.indexOf('s:') === 0) return p.sub === v.slice(2);
+                return true;
+            }
+            function setView(v) {
+                state.view = v;
+                closeMenu();
+                renderAll();
+            }
+            /* ---------- render ---------- */
+            function renderFeed() {
+                var list = document.getElementById('list');
+                list.textContent = '';
+                var title = 'All posts', desc = '';
+                if (state.view === 'joined') { title = 'Joined subs'; desc = 'Posts from subs you have joined'; }
+                else if (state.view === 'mine') { title = 'My posts'; desc = 'Posts by u/' + ME; }
+                else if (state.view.indexOf('s:') === 0) {
+                    var s = getSub(state.view.slice(2));
+                    title = 's/' + state.view.slice(2);
+                    desc = s ? s.desc : '';
+                }
+                document.getElementById('feed-title').textContent = title;
+                document.getElementById('feed-desc').textContent = desc;
+                document.getElementById('feed-desc').hidden = !desc;
+                var viewedSub = state.view.indexOf('s:') === 0 ? getSub(state.view.slice(2)) : null;
+                document.getElementById('delete-sub').hidden = !(state.isModerator && viewedSub);
+                var shown = order.map(getPost).filter(function (p) { return p && inView(p); });
+                if (!shown.length) {
+                    var msg = 'No posts yet.';
+                    if (state.view === 'joined') msg = 'You have not joined any subs with posts yet. Join one from the list.';
+                    else if (state.view === 'mine') msg = 'You have not posted yet. Use Post to add one.';
+                    else if (state.view.indexOf('s:') === 0) msg = 'No posts in ' + title + ' yet. Be the first to post.';
+                    list.appendChild(el('div', 'empty', msg));
+                    return;
+                }
+                shown.forEach(function (p) {
+                    var isVoted = !!state.voted[p.id];
+                    var post = el('div', 'post');
+                    var vote = el('div', 'vote');
+                    var btn = el('button', '', '\u25B2');
+                    btn.type = 'button';
+                    btn.setAttribute('aria-pressed', isVoted ? 'true' : 'false');
+                    btn.setAttribute('aria-label', (isVoted ? 'Remove upvote from ' : 'Upvote ') + p.title);
+                    btn.addEventListener('click', function () {
+                        btn.disabled = true;
+                        supabaseClient.rpc('toggle_upvote', { p_post_id: p.id, p_visitor_id: visitorId })
+                            .then(function (result) {
+                                if (result.error) throw result.error;
+                                return refreshData();
+                            })
+                            .then(renderAll)
+                            .catch(showError)
+                            .then(function () { btn.disabled = false; });
+                    });
+                    vote.appendChild(btn);
+                    vote.appendChild(el('div', 'count', p.votes.toLocaleString()));
+                    post.appendChild(vote);
+                    if (p.imagePath) {
+                        var full = imageUrl(p.imagePath);
+                        var th = el('div', 'thumb');
+                        var link = el('a');
+                        link.href = full;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.setAttribute('aria-label', 'Open full image for ' + p.title);
+                        var pic = document.createElement('img');
+                        pic.src = full;
+                        pic.width = 96;
+                        pic.height = 96;
+                        pic.alt = '';
+                        pic.loading = 'lazy';
+                        pic.decoding = 'async';
+                        link.appendChild(pic);
+                        th.appendChild(link);
+                        post.appendChild(th);
+                    } else if (p.image) {
+                        var thp = el('div', 'thumb');
+                        thp.appendChild(img(p.id, 96));
+                        post.appendChild(thp);
+                    }
+                    var body = el('div', 'body');
+                    var t = el('p', 'title');
+                    if (p.url) {
+                        var a = el('a', '', p.title);
+                        a.href = p.url;
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                        t.appendChild(a);
+                    } else {
+                        t.textContent = p.title;
+                    }
+                    body.appendChild(t);
+                    var meta = el('div', 'meta');
+                    var subBtn = el('button', 'linklike', 's/' + p.sub);
+                    subBtn.type = 'button';
+                    subBtn.addEventListener('click', function () { setView('s:' + p.sub); });
+                    meta.appendChild(subBtn);
+                    var h = p.url ? host(p.url) : '';
+                    var authorProfile = profilesById[p.authorId];
+                    if (authorProfile && authorProfile.avatar_path) meta.appendChild(accountAvatar(p.author, authorProfile.avatar_path, 20, 'avatar post-avatar'));
+                    meta.appendChild(document.createTextNode(' by '));
+                    meta.appendChild(usernameNode((authorProfile && authorProfile.username) || p.author, 'u/', !!(currentUser && (p.authorId === visitorId || (authorProfile && authorProfile.id === currentUser.id)))));
+                    meta.appendChild(document.createTextNode(', ' + ago(p.created) + (h ? ', ' + h : '')));
+                    if (state.isModerator) {
+                        var del = el('button', 'linklike mod-delete', 'Delete');
+                        del.type = 'button';
+                        del.addEventListener('click', function () {
+                            if (window.confirm('Delete this post? This cannot be undone.')) deletePost(p, del);
+                        });
+                        meta.appendChild(document.createTextNode(' · '));
+                        meta.appendChild(del);
+                    }
+                    body.appendChild(meta);
+                    post.appendChild(body);
+                    list.appendChild(post);
+                });
+            }
+            function renderSidebar() {
+                var allBtn = document.getElementById('view-all');
+                allBtn.setAttribute('aria-current', state.view === 'all' ? 'true' : 'false');
+                var box = document.getElementById('sublist');
+                box.textContent = '';
+                state.subs.slice().sort(function (a, b) {
+                    return (b.joined - a.joined) || (b.members - a.members);
+                }).forEach(function (s) {
+                    var row = el('div', 'sub');
+                    row.appendChild(img('sub-' + s.name, 32, 'avatar'));
+                    var main = el('button', 'sub-main');
+                    main.type = 'button';
+                    main.setAttribute('aria-current', state.view === 's:' + s.name ? 'true' : 'false');
+                    main.appendChild(el('span', 'sub-name', 's/' + s.name));
+                    main.appendChild(el('span', 'sub-members', members(s.members)));
+                    main.addEventListener('click', function () { setView('s:' + s.name); });
+                    row.appendChild(main);
+                    var join = el('button', 'join', s.joined ? 'Joined' : 'Join');
+                    join.type = 'button';
+                    join.setAttribute('aria-pressed', s.joined ? 'true' : 'false');
+                    join.setAttribute('aria-label', (s.joined ? 'Leave s/' : 'Join s/') + s.name);
+                    join.addEventListener('click', function () {
+                        join.disabled = true;
+                        supabaseClient.rpc('toggle_membership', { p_sub_id: s.id, p_visitor_id: visitorId })
+                            .then(function (result) {
+                                if (result.error) throw result.error;
+                                return refreshData();
+                            })
+                            .then(renderAll)
+                            .catch(showError)
+                            .then(function () { join.disabled = false; });
+                    });
+                    row.appendChild(join);
+                    box.appendChild(row);
+                });
+            }
+            function renderAccount() {
+                var btn = document.getElementById('account-btn');
+                var menu = document.getElementById('menu');
+                btn.textContent = '';
+                menu.textContent = '';
+                closeMenu();
+                btn.className = 'account-btn';
+                btn.setAttribute('aria-haspopup', 'true');
+                btn.setAttribute('aria-expanded', 'false');
+                btn.appendChild(currentProfile ? accountAvatar('user-' + ME, currentProfile.avatar_path, 28, 'avatar') : img('user-' + ME, 28, 'avatar'));
+                if (state.isModerator) btn.appendChild(document.createTextNode('Moderator'));
+                else if (currentUser) btn.appendChild(usernameNode(ME, 'u/', true));
+                else btn.appendChild(document.createTextNode('Log in / Sign up'));
+                btn.appendChild(document.createTextNode(' ▾'));
+                if (!currentUser) {
+                    [['Log in', function () { document.getElementById('l-err').textContent = ''; openDialog('dlg-login', 'l-email'); }],
+                     ['Create account', function () { document.getElementById('a-err').textContent = ''; openDialog('dlg-account', 'a-email'); }],
+                    ].forEach(function (item) { var b = el('button', '', item[0]); b.type = 'button'; b.addEventListener('click', item[1]); menu.appendChild(b); });
+                    return;
+                }
+                var head = el('div', 'menu-head');
+                head.appendChild(currentProfile ? accountAvatar('user-' + ME, currentProfile.avatar_path, 32, 'avatar') : img('user-' + ME, 32, 'avatar'));
+                var who = el('div', 'clear');
+                var whoName = el('div', 'clear');
+                whoName.appendChild(usernameNode(ME, 'u/', true));
+                who.appendChild(whoName);
+                var posts = state.posts.filter(function (p) { return p.authorId === visitorId; }).length;
+                var joined = state.subs.filter(function (s) { return s.joined; }).length;
+                var sub = el('div', 'clear muted', currentUser.email || 'Signed in');
+                sub.style.fontSize = '12px'; who.appendChild(sub); head.appendChild(who); menu.appendChild(head);
+                [['My posts (' + posts + ')', function () { setView('mine'); }],
+                 ['Joined subs (' + joined + ')', function () { setView('joined'); }],
+                 ['Change username', function () { document.getElementById('username-err').textContent = ''; document.getElementById('new-username').value = ME; openDialog('dlg-username', 'new-username'); }],
+                 ['Change profile picture', function () { document.getElementById('avatar-file').click(); }],
+                 ['Log out', signOutAccount]
+                ].forEach(function (item) { var b = el('button', '', item[0]); b.type = 'button'; b.addEventListener('click', item[1]); menu.appendChild(b); });
+            }
+            async function signOutAccount() {
+                var result = await supabaseClient.auth.signOut();
+                if (result.error) { showError(result.error); return; }
+                currentUser = null; currentProfile = null; state.currentUser = null; state.profile = null;
+                visitorId = visitorIdForGuest(); ME = 'visitor_' + visitorId.slice(0, 8);
+                await refreshData(); renderAll(); notify('Logged out.');
+            }
+            async function uploadProfileAvatar(file) {
+                if (!currentUser) { notify('Log in first to set a profile picture.'); return; }
+                var allowed = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp' };
+                if (!allowed[file.type]) { notify('Use a JPG, PNG, GIF or WebP image.'); return; }
+                if (file.size > 2 * 1024 * 1024) { notify('Profile pictures must be 2 MB or smaller.'); return; }
+                var path = currentUser.id + '/' + crypto.randomUUID() + '.' + allowed[file.type];
+                var uploaded = await supabaseClient.storage.from(ACCOUNT_AVATAR_BUCKET).upload(path, file, { contentType: file.type, upsert: false, cacheControl: '3600' });
+                if (uploaded.error) throw uploaded.error;
+                var saved = await supabaseClient.from('profiles').update({ avatar_path: path }).eq('id', currentUser.id).select('id,username,avatar_path').single();
+                if (saved.error) throw saved.error;
+                currentProfile = saved.data; state.profile = currentProfile; renderAll(); notify('Profile picture updated.');
+            }
+            function renderTabs() {
+                document.getElementById('sort-top').setAttribute('aria-pressed', state.sort === 'top' ? 'true' : 'false');
+                document.getElementById('sort-new').setAttribute('aria-pressed', state.sort === 'new' ? 'true' : 'false');
+            }
+            function renderAll() {
+                renderTabs();
+                renderSidebar();
+                renderAccount();
+                renderFeed();
+            }
+            /* ---------- account menu ---------- */
+            function closeMenu() {
+                var menu = document.getElementById('menu');
+                var btn = document.getElementById('account-btn');
+                if (!menu.hidden) {
+                    menu.hidden = true;
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+            }
+            document.getElementById('account-btn').addEventListener('click', function () {
+                var menu = document.getElementById('menu');
+                var open = menu.hidden;
+                menu.hidden = !open;
+                this.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+            document.addEventListener('click', function (e) {
+                if (!document.getElementById('account').contains(e.target)) closeMenu();
+            });
+            /* ---------- dialogs ---------- */
+            function openDialog(id, focusId) {
+                lastFocus = document.activeElement;
+                document.getElementById(id).hidden = false;
+                var f = document.getElementById(focusId);
+                if (f) f.focus();
+            }
+            function closeDialog(id) {
+                document.getElementById(id).hidden = true;
+                if (lastFocus && lastFocus.focus) lastFocus.focus();
+            }
+            document.querySelectorAll('[data-close]').forEach(function (b) {
+                b.addEventListener('click', function () { closeDialog(b.getAttribute('data-close')); });
+            });
+            document.querySelectorAll('.overlay').forEach(function (o) {
+                o.addEventListener('mousedown', function (e) { if (e.target === o) closeDialog(o.id); });
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key !== 'Escape') return;
+                closeMenu();
+                ['dlg-post', 'dlg-sub', 'dlg-account', 'dlg-login', 'dlg-username'].forEach(function (id) {
+                    if (!document.getElementById(id).hidden) closeDialog(id);
+                });
+            });
+            document.getElementById('a-switch-login').addEventListener('click', function () { closeDialog('dlg-account'); openDialog('dlg-login', 'l-email'); });
+            document.getElementById('l-switch-signup').addEventListener('click', function () { closeDialog('dlg-login'); openDialog('dlg-account', 'a-email'); });
+            document.getElementById('form-account').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                var err = document.getElementById('a-err'), submit = document.getElementById('a-submit');
+                var email = document.getElementById('a-email').value.trim();
+                var username = document.getElementById('a-username').value.trim();
+                var password = document.getElementById('a-password').value;
+                var file = document.getElementById('a-avatar').files[0] || null;
+                if (!/^[A-Za-z0-9_]{3,21}$/.test(username)) { err.textContent = 'Use 3–21 letters, numbers or underscores for the username.'; return; }
+                if (password.length < 8) { err.textContent = 'Use a password with at least 8 characters.'; return; }
+                if (file && (!({ 'image/jpeg': 1, 'image/png': 1, 'image/gif': 1, 'image/webp': 1 })[file.type] || file.size > 2 * 1024 * 1024)) { err.textContent = 'Choose a JPG, PNG, GIF or WebP image up to 2 MB.'; return; }
+                submit.disabled = true; err.textContent = '';
+                try {
+                    var taken = await supabaseClient.from('profiles').select('username').ilike('username', username).limit(1);
+                    if (taken.error) throw taken.error;
+                    if (taken.data && taken.data.length) throw new Error('That username is taken. Please choose another one.');
+                    var sign = await supabaseClient.auth.signUp({ email: email, password: password, options: { data: { username: username } } });
+                    if (sign.error) throw sign.error;
+                    if (!sign.data.user) throw new Error('Account creation did not return a user. Please try again.');
+                    if (sign.data.session) {
+                        currentUser = sign.data.user; visitorId = currentUser.id;
+                        var profileInsert = await supabaseClient.from('profiles').upsert({ id: currentUser.id, username: username }, { onConflict: 'id' }).select('id,username,avatar_path').single();
+                        if (profileInsert.error) throw profileInsert.error;
+                        currentProfile = profileInsert.data; state.currentUser = currentUser; state.profile = currentProfile; ME = currentProfile.username;
+                        if (file) await uploadProfileAvatar(file);
+                        await refreshData(); renderAll(); closeDialog('dlg-account');
+                        document.getElementById('a-password').value = ''; document.getElementById('a-avatar').value = '';
+                        notify('Welcome to Upvotes, u/' + ME + '!');
+                    } else {
+                        closeDialog('dlg-account');
+                        notify('Check your email to confirm your account, then log in. Your username is reserved after confirmation.');
+                    }
+                } catch (error) { err.textContent = explainAuthError(error); console.error('Account creation failed:', error); }
+                finally { submit.disabled = false; }
+            });
+            document.getElementById('form-username').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                var err = document.getElementById('username-err');
+                var submit = document.getElementById('username-submit');
+                var username = document.getElementById('new-username').value.trim();
+                if (!currentUser || !currentProfile) { err.textContent = 'Log in first to change your username.'; return; }
+                if (!/^[A-Za-z0-9_]{3,21}$/.test(username)) { err.textContent = 'Use 3–21 letters, numbers or underscores.'; return; }
+                if (username.toLowerCase() === String(ME).toLowerCase()) { closeDialog('dlg-username'); return; }
+                submit.disabled = true; err.textContent = '';
+                try {
+                    var taken = await supabaseClient.from('profiles').select('id,username').ilike('username', username).limit(1);
+                    if (taken.error) throw taken.error;
+                    if (taken.data && taken.data.some(function (p) { return p.id !== currentUser.id; })) throw new Error('That username is already taken. Please choose another one.');
+                    var saved = await supabaseClient.from('profiles').update({ username: username }).eq('id', currentUser.id).select('id,username,avatar_path').single();
+                    if (saved.error) throw saved.error;
+                    currentProfile = saved.data; state.profile = currentProfile; ME = currentProfile.username;
+                    await refreshData(); renderAll(); closeDialog('dlg-username');
+                    notify('Username changed to u/' + ME + '.');
+                } catch (error) {
+                    var message = error && error.message ? error.message : String(error);
+                    if (/duplicate key|unique constraint|profiles_username/i.test(message)) message = 'That username is already taken. Please choose another one.';
+                    err.textContent = message;
+                    console.error('Username update failed:', error);
+                } finally { submit.disabled = false; }
+            });
+            document.getElementById('form-login').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                var err = document.getElementById('l-err'), submit = document.getElementById('l-submit');
+                submit.disabled = true; err.textContent = '';
+                try {
+                    var result = await supabaseClient.auth.signInWithPassword({ email: document.getElementById('l-email').value.trim(), password: document.getElementById('l-password').value });
+                    if (result.error) throw result.error;
+                    await applyUserSession(result.data.session);
+                    document.getElementById('l-password').value = ''; closeDialog('dlg-login');
+                    notify('Logged in as u/' + ME + '.');
+                } catch (error) { err.textContent = explainAuthError(error); console.error('Login failed:', error); }
+                finally { submit.disabled = false; }
+            });
+            document.getElementById('avatar-file').addEventListener('change', async function () {
+                var file = this.files[0]; this.value = ''; if (!file) return;
+                try { await uploadProfileAvatar(file); } catch (error) { showError(error); }
+            });
+            /* image picker in the post dialog */
+            function clearImage() {
+                var input = document.getElementById('p-file');
+                input.value = '';
+                if (previewUrl) {
+                    URL.revokeObjectURL(previewUrl);
+                    previewUrl = null;
+                }
+                document.getElementById('p-preview-img').removeAttribute('src');
+                document.getElementById('p-preview').hidden = true;
+            }
+            document.getElementById('p-file').addEventListener('change', function () {
+                var err = document.getElementById('p-err');
+                var file = this.files && this.files[0];
+                err.textContent = '';
+                if (!file) { clearImage(); return; }
+                var problem = checkImage(file);
+                if (problem) {
+                    clearImage();
+                    err.textContent = problem;
+                    return;
+                }
+                if (previewUrl) URL.revokeObjectURL(previewUrl);
+                previewUrl = URL.createObjectURL(file);
+                document.getElementById('p-preview-img').src = previewUrl;
+                document.getElementById('p-preview').hidden = false;
+            });
+            document.getElementById('p-clear').addEventListener('click', function () {
+                clearImage();
+                document.getElementById('p-file').focus();
+            });
+            /* post dialog */
+            document.getElementById('open-post').addEventListener('click', function () {
+                var sel = document.getElementById('p-sub');
+                sel.textContent = '';
+                var def = state.view.indexOf('s:') === 0 ? state.view.slice(2) : null;
+                if (!def) {
+                    var j = state.subs.filter(function (s) { return s.joined; })[0];
+                    def = j ? j.name : (state.subs[0] ? state.subs[0].name : null);
+                }
+                state.subs.forEach(function (s) {
+                    var o = document.createElement('option');
+                    o.value = s.name;
+                    o.textContent = 's/' + s.name;
+                    if (s.name === def) o.selected = true;
+                    sel.appendChild(o);
+                });
+                clearImage();
+                document.getElementById('p-err').textContent = '';
+                openDialog('dlg-post', 'p-title');
+            });
+            document.getElementById('form-post').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                var title = document.getElementById('p-title').value.trim();
+                var rawUrl = document.getElementById('p-url').value;
+                var url = normalizeUrl(rawUrl);
+                var err = document.getElementById('p-err');
+                if (!title) { err.textContent = 'Add a title.'; return; }
+                if (rawUrl.trim() && !url) { err.textContent = 'That link is not a valid URL.'; return; }
+                var sub = document.getElementById('p-sub').value;
+                var selectedSub = getSub(sub);
+                if (!selectedSub) { err.textContent = 'Pick a sub.'; return; }
+                var file = document.getElementById('p-file').files[0] || null;
+                if (file) {
+                    var problem = checkImage(file);
+                    if (problem) { err.textContent = problem; return; }
+                }
+                var submit = document.getElementById('p-submit');
+                submit.disabled = true;
+                err.textContent = '';
+                var uploadedPath = null;
+                try {
+                    if (file) {
+                        submit.textContent = 'Uploading...';
+                        var path = visitorId + '/' + crypto.randomUUID() + '.' + IMAGE_TYPES[file.type];
+                        var up = await supabaseClient.storage.from(IMAGE_BUCKET).upload(path, file, {
+                            contentType: file.type,
+                            cacheControl: '31536000',
+                            upsert: false
+                        });
+                        if (up.error) throw up.error;
+                        uploadedPath = path;
+                    }
+                    submit.textContent = 'Posting...';
+                    var result = await supabaseClient.from('posts').insert({
+                        sub_id: selectedSub.id,
+                        author_id: visitorId,
+                        author_name: ME,
+                        title: title,
+                        url: url || null,
+                        has_image: !!uploadedPath,
+                        image_path: uploadedPath
+                    });
+                    if (result.error) throw result.error;
+                    uploadedPath = null; // the post owns the file now
+                    await refreshData();
+                    document.getElementById('p-title').value = '';
+                    document.getElementById('p-url').value = '';
+                    clearImage();
+                    closeDialog('dlg-post');
+                    state.view = 's:' + sub;
+                    renderAll();
+                    notify('Posted in s/' + sub + '.');
+                } catch (error) {
+                    err.textContent = error.message || String(error);
+                    console.error('Could not create post:', error);
+                    if (uploadedPath) {
+                        // Visitors can't delete from storage, so this may be a no-op; it only helps if allowed.
+                        supabaseClient.storage.from(IMAGE_BUCKET).remove([uploadedPath]).catch(function () {});
+                    }
+                } finally {
+                    submit.textContent = 'Post';
+                    submit.disabled = false;
+                }
+            });
+            /* sub dialog */
+            document.getElementById('open-sub').addEventListener('click', function () {
+                document.getElementById('s-err').textContent = '';
+                openDialog('dlg-sub', 's-name');
+            });
+            document.getElementById('form-sub').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                var name = document.getElementById('s-name').value.trim().replace(/^s\//i, '').toLowerCase();
+                var desc = document.getElementById('s-desc').value.trim();
+                var err = document.getElementById('s-err');
+                if (!/^[a-z0-9_]{3,21}$/.test(name)) { err.textContent = 'Use 3 to 21 letters, numbers or underscores.'; return; }
+                if (getSub(name)) { err.textContent = 's/' + name + ' already exists. Pick another name.'; return; }
+                var submit = this.querySelector('button[type="submit"]');
+                submit.disabled = true;
+                err.textContent = '';
+                try {
+                    var result = await supabaseClient.rpc('create_sub', {
+                        p_name: name,
+                        p_description: desc,
+                        p_visitor_id: visitorId
+                    });
+                    if (result.error) throw result.error;
+                    await refreshData();
+                    document.getElementById('s-name').value = '';
+                    document.getElementById('s-desc').value = '';
+                    closeDialog('dlg-sub');
+                    state.view = 's:' + name;
+                    renderAll();
+                    notify('Made s/' + name + ' and joined it.');
+                } catch (error) {
+                    err.textContent = error.code === '23505'
+                        ? 's/' + name + ' already exists. Pick another name.'
+                        : (error.message || String(error));
+                    console.error('Could not create sub:', error);
+                } finally {
+                    submit.disabled = false;
+                }
+            });
+            /* ---------- controls ---------- */
+            document.getElementById('sort-top').addEventListener('click', function () { state.sort = 'top'; sortOrder(); renderAll(); });
+            document.getElementById('sort-new').addEventListener('click', function () { state.sort = 'new'; sortOrder(); renderAll(); });
+            document.getElementById('view-all').addEventListener('click', function () { setView('all'); });
+            document.getElementById('delete-sub').addEventListener('click', function () {
+                var sub = state.view.indexOf('s:') === 0 ? getSub(state.view.slice(2)) : null;
+                if (!sub) return;
+                var count = state.posts.filter(function (p) { return p.subId === sub.id; }).length;
+                var msg = 'Delete s/' + sub.name + ' and its ' + count + ' post' + (count === 1 ? '' : 's') + '? This cannot be undone.';
+                if (window.confirm(msg)) deleteSub(sub, this);
+            });
+            async function start() {
+                if (SUPABASE_URL.indexOf('YOUR_PROJECT_ID') !== -1 ||
+                    SUPABASE_ANON_KEY.indexOf('YOUR_SUPABASE_') === 0) {
+                    renderAll();
+                    notify('Add your Supabase project URL and publishable/anon key in index.html.');
+                    return;
+                }
+                if (!window.supabase) {
+                    renderAll();
+                    notify('Could not load the Supabase client. Check your internet connection and reload.');
+                    return;
+                }
+                try {
+                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    var sessionResult = await supabaseClient.auth.getSession();
+                    if (sessionResult.error) throw sessionResult.error;
+                    await applyUserSession(sessionResult.data.session);
+                    supabaseClient.auth.onAuthStateChange(function (event, session) {
+                        Promise.resolve().then(async function () {
+                            if (event === 'SIGNED_OUT') {
+                                currentUser = null; currentProfile = null; state.currentUser = null; state.profile = null;
+                                visitorId = visitorIdForGuest(); ME = 'visitor_' + visitorId.slice(0, 8);
+                                setModeratorSession(null); await refreshData(); renderAll();
+                            } else if (session && session.user && (!currentUser || currentUser.id !== session.user.id)) {
+                                await applyUserSession(session);
+                            } else { setModeratorSession(session); renderAll(); }
+                        }).catch(showError);
+                    });
+                    document.getElementById('open-post').disabled = false;
+                    document.getElementById('open-sub').disabled = false;
+                    renderAll();
+                    supabaseClient.channel('public-feed')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, refreshRemoteData)
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'subs' }, refreshRemoteData)
+                        .subscribe(function (status) {
+                            if (status === 'CHANNEL_ERROR') {
+                                notify('Live updates are unavailable. Reload the page to refresh.');
+                            }
+                        });
+                } catch (error) {
+                    renderAll();
+                    showError(error);
+                }
+            }
+            function refreshRemoteData() {
+                refreshData().then(renderAll).catch(showError);
+            }
+            window.addEventListener('load', start);
+        </script>
+    </body>
+</html>
