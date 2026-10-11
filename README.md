@@ -1,37 +1,43 @@
 # Upvotes
+
 *A reddit clone with no hate!*
 
-## Why I made it
-Lots of platforms online get extreme hate on peoples posts with dislikes or downvotes, so I made a platform with only upvotes!
+### My motivation to create this:
+
+Many sites online receive a lot of hate on peoples posts with dislikes/down votes so I created a site with only up votes!
 
 ## How it works
-Upvotes is a single-page web app (one 'index.html') backed by [Supabase] (https://supabase.com).
 
-### The basics
-- **Subs**: Communities named 's/<name>'. Anyone can make one (3-21 characters: letters, numbers or underscores) and it comes with a description. Creating a sub automatically joins you to it.
+Upvotes is a single page web app (a single index.html) powered by Supabase.
 
-- **Posts**: Pick a sub, add a title (up to 200 characters), and optionally attach a link and/or an image (JPG, PNG, GIF or WebP, up to 5 MB).
+## The basics
 
-- **Upvotes only**: Click the ▲ to upvote a post, click it again to take the upvote back. There is no downvote button, anywhere.
+- **Subs**: s/<name> communities. Anyone can create a sub (3-21 characters of letters, numbers, and/or underscores) and have a description. By creating a sub you get added to it.
 
-- **Sorting**: View posts by **Top** (most upvotes) or **New** (most recent).
+- **Posts**: Select a sub, enter a title (up to 200 characters), then include a link and/or an image (JPG, PNG, GIF or WebP, up to 5 MB).
 
-- **Joining**: Join or leave subs from the sidebar. Use the account menu to see only your own posts or only posts from subs you have joined.
+- **Upvotes only**: click on to upvote a post, click on again to undo the upvote. And there is no downvote button in any place.
 
-- **Live updates**: New posts and subs show up in real time without reloading.
+- **Sort**: Posts can be sorted by Top (most upvoted) or New (most recent).
+
+- **Browsing**: Browse all of your own posts, or only the posts from the subs you have joined, using the account menu. See all posts, or limit to only those you have joined in the account menu.
+
+- **As you scroll**, new posts and subs are added dynamically.
 
 ### Who are you?
-You create an account on first visit to post, and then you can sign in to that account anywhere.
+
+You first visit to post creates an account for you, once you do so you can log into this account from anywhere.
 
 ### Moderation
-Moderators can sign in from the account menu with an email and password. Signed-in moderators can:
-- Delete any post (its image is removed too)
-- Delete an entire sub along with all of its posts
 
+Moderators can Log in from account menu with an email and password. Logged in moderators can:
+- Remove any post (as well as the image)
+- One entire sub and all its posts.
 
-Moderator access is granted by setting `role: moderator` in a user's `app_metadata` in Supabase Auth, and it is enforced by Row Level Security in the database, not just by hiding buttons in the UI.
+The button for grant to mod is restricted by role: moderator in app_metadata on db in supabase auth, and it is not only hidden from UI but also row level security on db.
 
-## Tech stack
+### Tech stack
+
 - Plain HTML, CSS and JavaScript (no build step)
-- [Supabase](https://supabase.com): Postgres database, Auth, Storage (post images and pfp's) and Realtime (live feed)
-- [`@supabase/supabase-js`](https://github.com/supabase/supabase-js) loaded from jsDelivr
+- Supabase, https://supabase.com: Postgres DB, Auth, Storage (for posting images and pfp's) and Realtime (live feed)
+- @supabase/supabase-js loaded from jsDelivr
